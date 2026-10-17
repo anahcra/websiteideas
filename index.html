@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raja Labs · Nanoscale Spectroscopy</title>
+<meta name="description" content="A research group at the Molecular Foundry, Lawrence Berkeley National Laboratory. We image and time-resolve excitations in two-dimensional materials with light and electrons, down to the nanometer and femtosecond.">
+<script>
+  (function () {
+    try {
+      var t = localStorage.getItem("raja-theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  })();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  * { box-sizing: border-box; }
+
+  :root, [data-theme="light"] {
+    color-scheme: light;
+    --bg: #f6f3ee; --surface: #fffdfa; --ink: #17150f; --ink2: #4a463f; --muted: #6b655c;
+    --faint: #9a9386; --muted-inv: #a9a398; --line: rgba(23,21,15,0.06); --line2: rgba(23,21,15,0.08);
+    --nav: rgba(246,243,238,0.85); --ribbon: #17150f; --pill: #f6f3ee; --shadow: rgba(23,21,15,0.25);
+    --accent: #d9722b;
+  }
+  [data-theme="dark"] {
+    color-scheme: dark;
+    --bg: #17150f; --surface: #1f1c16; --ink: #f6f3ee; --ink2: #c9c2b6; --muted: #a9a398;
+    --faint: #7a736a; --muted-inv: #6b655c; --line: rgba(246,243,238,0.08); --line2: rgba(246,243,238,0.1);
+    --nav: rgba(23,21,15,0.85); --ribbon: #2a2620; --pill: #f6f3ee; --shadow: rgba(0,0,0,0.6);
+    --accent: #d9722b;
+  }
+
+  body {
+    background: var(--bg); color: var(--ink);
+    font-family: 'Manrope', Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  a:hover { color: var(--accent); }
+
+  .page { min-height: 100vh; display: flex; flex-direction: column; }
+  .container { max-width: 1350px; margin: 0 auto; padding-left: clamp(20px,4vw,40px); padding-right: clamp(20px,4vw,40px); }
+  .serif { font-family: 'Instrument Serif', Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -0.01em; }
+  .eyebrow { font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.14em; color: var(--muted); }
+  .h2 { margin: 0; font-weight: 700; text-wrap: balance; font-size: clamp(32px,4.4vw,56px); line-height: 1.02; letter-spacing: -0.03em; }
+  .surface { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .card { background: var(--bg); border-radius: 22px; padding: 28px; display: flex; flex-direction: column; gap: 14px; }
+  .card p { margin: 0; font-size: 16px; color: var(--ink2); line-height: 1.5; text-wrap: pretty; }
+  .split { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 48px; align-items: start; }
+
+  /* Nav */
+  .nav-spacer { height: 64px; flex: none; }
+  .nav { position: fixed; top: 12px; left: 0; right: 0; z-index: 50; padding: 0 clamp(12px,3vw,24px); pointer-events: none; }
+  .nav-inner {
+    pointer-events: auto; max-width: 1350px; margin: 0 auto;
+    backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--line2); border-radius: 18px; height: 64px; background: var(--nav);
+    box-shadow: 0 8px 30px -18px var(--shadow);
+    display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 10px 12px 10px 18px;
+  }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 18px; letter-spacing: -0.02em; color: var(--ink); }
+  .brand svg { display: block; }
+  .nav-links { display: flex; align-items: center; gap: 26px; font-size: 18px; font-weight: 600; color: var(--ink2); }
+  .nav-actions { display: flex; align-items: center; gap: 10px; }
+  .theme-toggle {
+    display: flex; align-items: center; justify-content: center; width: 44px; height: 44px;
+    background: transparent; border: 1px solid var(--line2); color: var(--muted); border-radius: 12px; cursor: pointer;
+  }
+  .theme-toggle:hover { border-color: var(--ink); }
+  .theme-toggle span { width: 10px; height: 10px; border-radius: 50%; background: var(--ink); display: inline-block; box-shadow: inset 3px -2px 0 0 var(--bg); }
+  .btn-nav { display: inline-block; background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 12px; font-size: 18px; font-weight: 700; white-space: nowrap; }
+  .btn-nav:hover { background: var(--accent); color: #f6f3ee; }
+  @media (max-width: 760px) {
+    .nav-links { display: none; }
+    .btn-nav { font-size: 16px; padding: 10px 14px; }
+  }
+
+  /* Hero */
+  main { flex: 1; display: flex; flex-direction: column; overflow-x: hidden; }
+  .hero { position: relative; height: clamp(640px,92vh,880px); overflow: hidden; padding-bottom: 40px; }
+  .hero-stage { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+  .hero-stage svg { display: block; flex-shrink: 0; overflow: visible; }
+  .hero-copy-wrap { position: relative; z-index: 1; height: 77%; display: flex; align-items: center; justify-content: center; }
+  .hero-copy { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 22px; }
+  .hero-copy .eyebrow { font-size: clamp(13px,1.9vw,18px); white-space: nowrap; }
+  .hero h1 { margin: 0; font-weight: 700; text-wrap: balance; font-size: clamp(64px,6.4vw,84px); line-height: 0.98; letter-spacing: -0.035em; max-width: 11ch; }
+  .hero p { margin: 0; font-size: clamp(18px,1.6vw,21px); line-height: 1.45; color: var(--ink2); max-width: 44ch; text-wrap: pretty; }
+
+  /* Research */
+  .research-inner { padding-top: 96px; padding-bottom: 96px; display: flex; flex-direction: column; gap: 56px; }
+  .section-head { display: flex; flex-direction: column; gap: 14px; max-width: 60ch; }
+  .research-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; }
+  .card-num { font-size: 18px; font-weight: 700; letter-spacing: 0.12em; color: var(--accent); }
+  .card-title { font-weight: 800; font-size: 20px; letter-spacing: -0.02em; }
+
+  /* Publications */
+  .publications { width: 100%; padding-top: 96px; padding-bottom: 96px; }
+  .pub-intro { display: flex; flex-direction: column; gap: 16px; }
+  .pub-intro p { margin: 0; color: var(--ink2); line-height: 1.5; font-size: 18px; max-width: 44ch; text-wrap: pretty; }
+  .link-underline { align-self: flex-start; margin-top: 8px; font-weight: 700; border-bottom: 2px solid var(--accent); padding-bottom: 2px; }
+  .pub-list { display: flex; flex-direction: column; border-top: 1px solid var(--line2); margin: 0; padding: 0; list-style: none; }
+  .pub { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 16px; padding: 20px 0; border-bottom: 1px solid var(--line2); align-items: start; }
+  .pub-meta { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  .pub-title { font-weight: 700; line-height: 1.3; text-wrap: pretty; }
+  .pub-journal { font-size: 18px; color: var(--muted); }
+  .pub-year { font-size: 18px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); white-space: nowrap; }
+
+  /* People */
+  .people-inner { padding-top: 96px; padding-bottom: 96px; display: flex; flex-direction: column; gap: 56px; }
+  .pi-role { font-size: 18px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent); }
+  .pi-name { font-weight: 800; font-size: clamp(20px,2.2vw,26px); letter-spacing: -0.025em; line-height: 1.1; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .chip { display: inline-block; flex: none; white-space: nowrap; font-size: 16px; font-weight: 600; border: 1px solid var(--line2); color: var(--muted); border-radius: 999px; padding: 4px 10px; }
+  .roster { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .roster-group { border-top: 2px solid var(--ink); padding-top: 16px; display: flex; flex-direction: column; gap: 6px; }
+  .roster-label { font-size: 18px; font-weight: 700; color: var(--muted); }
+  .roster-name { font-weight: 800; font-size: 18px; letter-spacing: -0.02em; }
+  .alumni { margin: 0; font-size: 18px; color: var(--muted); max-width: 70ch; text-wrap: pretty; }
+
+  /* CTA */
+  .cta { background: var(--ink); color: var(--bg); }
+  .cta-inner { padding-top: 112px; padding-bottom: 112px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; }
+  .cta h2 { margin: 0; font-weight: 700; text-wrap: balance; font-size: clamp(36px,5vw,64px); line-height: 1; letter-spacing: -0.03em; }
+  .cta p { margin: 0; color: var(--muted-inv); font-size: 18px; max-width: 40ch; text-wrap: pretty; }
+  .btn-cta { display: inline-block; margin-top: 6px; background: var(--bg); color: var(--ink); padding: 16px 28px; border-radius: 999px; font-size: 16px; font-weight: 700; }
+  .btn-cta:hover { background: var(--accent); color: #17150f; }
+
+  /* Footer */
+  .footer-wrap { background: var(--bg); color: var(--ink); display: flex; flex-direction: column; }
+  footer { width: 100%; padding-top: 28px; padding-bottom: 8px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 16px; font-size: 18px; color: var(--muted); }
+  .footer-links { display: flex; gap: 20px; }
+  .footer-links a { color: var(--muted); }
+  .footer-links a:hover { color: var(--accent); }
+  .wordmark-wrap { overflow: hidden; padding: 24px 0 clamp(24px,4vw,48px); display: flex; justify-content: center; }
+  .wordmark {
+    width: 100%; display: flex; justify-content: center; text-transform: uppercase; white-space: nowrap;
+    user-select: none; -webkit-user-select: none; font-weight: 800; font-size: 16.6vw; line-height: 0.82;
+    letter-spacing: -0.02em; color: var(--ink);
+  }
+  .wordmark span { display: inline-block; will-change: transform; }
+  .wordmark .gap { min-width: 0.25em; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="nav-spacer" aria-hidden="true"></div>
+  <nav class="nav">
+    <div class="nav-inner">
+      <a href="#" class="brand">
+        <svg width="28" height="28" viewBox="0 0 28 28" aria-hidden="true"><rect width="28" height="28" fill="var(--ink)"></rect><text x="14" y="21.5" text-anchor="middle" font-family="Manrope, Helvetica, sans-serif" font-weight="800" font-size="21" fill="var(--bg)">R</text></svg>
+        Raja Labs
+      </a>
+      <div class="nav-links">
+        <a href="#research">Research</a>
+        <a href="#publications">Publications</a>
+        <a href="#people">People</a>
+      </div>
+      <div class="nav-actions">
+        <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"><span aria-hidden="true"></span></button>
+        <a href="mailto:araja@lbl.gov" class="btn-nav">Join the group</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <header class="hero">
+      <div class="hero-stage" id="hero-stage" aria-hidden="true"></div>
+      <div class="hero-copy-wrap">
+        <div class="container hero-copy">
+          <div class="eyebrow">Raja Labs · Nanoscale Spectroscopy</div>
+          <h1>Seeing <em class="serif">excitons.</em></h1>
+          <p>A research group at the Molecular Foundry, Lawrence Berkeley National Laboratory. We image and time-resolve excitations in two-dimensional materials with light and electrons, down to the nanometer and femtosecond.</p>
+        </div>
+      </div>
+    </header>
+
+    <section id="research" class="surface">
+      <div class="container research-inner">
+        <div class="section-head">
+          <div class="eyebrow">Research</div>
+          <h2 class="h2">Light and electrons, <em class="serif">one layer thick.</em></h2>
+        </div>
+        <div class="research-grid">
+          <div class="card">
+            <div class="card-num">01</div>
+            <div class="card-title">Ultrasmall imaging</div>
+            <p>Correlated optical and low-loss electron energy-loss spectroscopy to image excitons inside a single moiré unit cell, at sub-nanometer resolution.</p>
+          </div>
+          <div class="card">
+            <div class="card-num">02</div>
+            <div class="card-title">Ultrafast dynamics</div>
+            <p>Ultrafast electron diffraction to watch energy and charge move across 2D heterostructure interfaces, including phonon-mediated transport unique to these systems.</p>
+          </div>
+          <div class="card">
+            <div class="card-num">03</div>
+            <div class="card-title">Dielectric screening</div>
+            <p>Tuning the bandgap and excitons of a 2D semiconductor through its environment, and the disorder that local dielectric fluctuations create.</p>
+          </div>
+          <div class="card">
+            <div class="card-num">04</div>
+            <div class="card-title">Moiré potentials</div>
+            <p>Painting potential landscapes on an atomically thin canvas: how twist and reconstruction localize, delocalize, and transport interlayer excitons.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="publications" class="container publications split">
+      <div class="pub-intro">
+        <div class="eyebrow">Publications</div>
+        <h2 class="h2">Ten papers, <em class="serif">four thousand citations.</em></h2>
+        <p>Key publications from the group and its collaborators. More than 4,600 total citations and an h-index of 27 as of October 2026.</p>
+        <a href="https://scholar.google.com" target="_blank" rel="noopener noreferrer" class="link-underline">Full list on Google Scholar</a>
+      </div>
+      <ul class="pub-list">
+        <li class="pub">
+          <div class="pub-meta"><span class="pub-title">Hyperspectral imaging of excitons within a moiré unit-cell with a sub-nanometer electron probe</span><span class="pub-journal">Science 378, 1235</span></div>
+          <span class="pub-year">2022</span>
+        </li>
+        <li class="pub">
+          <div class="pub-meta"><span class="pub-title">Bidirectional phonon emission in two-dimensional heterostructures triggered by ultrafast charge transfer</span><span class="pub-journal">Nature Nanotechnology 18, 29</span></div>
+          <span class="pub-year">2023</span>
+        </li>
+        <li class="pub">
+          <div class="pub-meta"><span class="pub-title">Anomalous interlayer exciton diffusion in WS₂/WSe₂ moiré heterostructure</span><span class="pub-journal">ACS Nano 18, 18202</span></div>
+          <span class="pub-year">2024</span>
+        </li>
+        <li class="pub">
+          <div class="pub-meta"><span class="pub-title">Coulomb engineering of the bandgap and excitons in two-dimensional materials</span><span class="pub-journal">Nature Communications 7, 15251</span></div>
+          <span class="pub-year">2017</span>
+        </li>
+        <li class="pub">
+          <div class="pub-meta"><span class="pub-title">Dielectric disorder in two-dimensional materials</span><span class="pub-journal">Nature Nanotechnology 14, 832</span></div>
+          <span class="pub-year">2019</span>
+        </li>
+        <li class="pub">
+          <div class="pub-meta"><span class="pub-title">Rigid band shifts in two-dimensional semiconductors through environmental screening</span><span class="pub-journal">Physical Review Letters 123, 206403</span></div>
+          <span class="pub-year">2019</span>
+        </li>
+        <li class="pub">
+          <div class="pub-meta"><span class="pub-title">Energy transfer from quantum dots to graphene and MoS₂: absorption vs. screening</span><span class="pub-journal">Nano Letters 16, 2328</span></div>
+          <span class="pub-year">2016</span>
+        </li>
+        <li class="pub">
+          <div class="pub-meta"><span class="pub-title">Enhancement of exciton-phonon scattering from monolayer to bilayer WS₂</span><span class="pub-journal">Nano Letters 18, 6135</span></div>
+          <span class="pub-year">2018</span>
+        </li>
+      </ul>
+    </section>
+
+    <section id="people" class="surface">
+      <div class="container people-inner">
+        <div class="split">
+          <div class="pub-intro">
+            <div class="eyebrow">People</div>
+            <h2 class="h2">A small group at a <em class="serif">national lab.</em></h2>
+          </div>
+          <div class="card">
+            <div class="pi-role">Principal investigator</div>
+            <div class="pi-name">Dr. Archana Raja</div>
+            <p>Staff Scientist, Molecular Foundry, and Faculty, Kavli Energy NanoScience Institute, Lawrence Berkeley National Laboratory. PhD in Chemical Physics, Columbia University; Integrated MSc in Chemistry, IIT Bombay.</p>
+            <div class="chips">
+              <span class="chip">Lab Director’s Award 2023</span>
+              <span class="chip">Early Career LDRD</span>
+              <span class="chip">Heising-Simons Fellow</span>
+            </div>
+          </div>
+        </div>
+        <div class="roster">
+          <div class="roster-group">
+            <div class="roster-label">Postdoctoral researchers</div>
+            <div class="roster-name">Dr. Laisi Chen</div>
+            <div class="roster-name">Dr. Garima Gupta</div>
+            <div class="roster-name">Dr. Ajit Dash</div>
+          </div>
+          <div class="roster-group">
+            <div class="roster-label">Graduate students</div>
+            <div class="roster-name">Misael Campos</div>
+          </div>
+          <div class="roster-group">
+            <div class="roster-label">SCGSR fellows</div>
+            <div class="roster-name">Mashnoon Sakib Alam</div>
+          </div>
+          <div class="roster-group">
+            <div class="roster-label">Undergraduates</div>
+            <div class="roster-name">Aadhish Ramanathan</div>
+            <div class="roster-name">Justin Tolentino</div>
+          </div>
+        </div>
+        <p class="alumni">Alumni have gone on to faculty positions at JNCASR, PhDs at Stanford, MIT, Purdue and Weizmann, and roles at ZEISS, ABB, PsiQuantum, Apple and Western Digital.</p>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="container cta-inner">
+        <h2>Come build the <em class="serif">microscope.</em></h2>
+        <p>We take postdocs, graduate students and SCGSR fellows interested in excitons, electrons and 2D materials.</p>
+        <a href="mailto:araja@lbl.gov" class="btn-cta">Get in touch</a>
+      </div>
+    </section>
+  </main>
+
+  <div class="footer-wrap">
+    <footer class="container">
+      <span>© <span id="year">2026</span> Raja Labs · Lawrence Berkeley National Laboratory</span>
+      <div class="footer-links">
+        <a href="#research">Research</a>
+        <a href="#publications">Publications</a>
+        <a href="#people">People</a>
+      </div>
+    </footer>
+    <div class="wordmark-wrap">
+      <div class="wordmark" id="wordmark" role="img" aria-label="Raja Labs">
+        <span aria-hidden="true">R</span><span aria-hidden="true">A</span><span aria-hidden="true">J</span><span aria-hidden="true">A</span><span aria-hidden="true" class="gap"> </span><span aria-hidden="true">L</span><span aria-hidden="true">A</span><span aria-hidden="true">B</span><span aria-hidden="true">S</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  var reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  document.getElementById("year").textContent = new Date().getFullYear();
+
+  // Theme toggle
+  document.getElementById("theme-toggle").addEventListener("click", function () {
+    var root = document.documentElement;
+    var next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("raja-theme", next); } catch (e) {}
+  });
+
+  // Hero ribbon: questions loop along the in-path, paper pills ride the out-ribbon
+  (function buildStage() {
+    var host = document.getElementById("hero-stage");
+    if (!host) return;
+    var NS = "http://www.w3.org/2000/svg";
+    var VIEW_W = 1440, VIEW_H = 860, VISIBLE_H = 620, REPEATS = 3, SPEED = 1;
+    var ribbon = "can an electron beam see a single exciton? · how fast does charge cross a 2D interface · what does the dielectric environment do to a bandgap · why does the moiré potential move · where does the energy go after absorption · ";
+    var labels = [
+      "Moiré excitons · Science 2022",
+      "Bidirectional phonons · Nat. Nano 2023",
+      "Coulomb engineering · Nat. Comm. 2017",
+      "Dielectric disorder · Nat. Nano 2019",
+      "Rigid band shifts · PRL 2019",
+      "Anomalous diffusion · ACS Nano 2024",
+      "Absorption vs. screening · Nano Lett. 2016",
+      "Exciton–phonon scattering · Nano Lett. 2018"
+    ];
+    function el(tag, attrs, parent) {
+      var n = document.createElementNS(NS, tag);
+      for (var k in attrs) n.setAttribute(k, attrs[k]);
+      if (parent) parent.appendChild(n);
+      return n;
+    }
+
+    var svg = el("svg", { viewBox: "0 0 " + VIEW_W + " " + VIEW_H });
+    var defs = el("defs", {}, svg);
+    el("path", { id: "rl-in", d: "M -2000 560 L 220 560 C 340 560 400 490 385 410 C 368 318 272 265 200 305 C 105 360 130 472 220 560 C 320 665 500 760 700 760", fill: "none" }, defs);
+    var outP = el("path", { id: "rl-out", d: "M 750 760 C 980 760 1150 640 1720 520 L 3430 160", fill: "none" }, defs);
+    var g = el("g", { transform: "translate(0 -95)" }, svg);
+    var text = el("text", {}, g);
+    text.style.cssText = "font-family:'Manrope',Helvetica,sans-serif;font-size:22px;font-weight:600;fill:var(--faint);letter-spacing:0.01em;";
+    var tp = el("textPath", { href: "#rl-in", startOffset: "0" }, text);
+    tp.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", "#rl-in");
+    tp.textContent = ribbon.repeat(REPEATS);
+    el("path", { d: outP.getAttribute("d"), fill: "none", stroke: "var(--ribbon)", "stroke-width": "64", "stroke-linecap": "butt" }, g);
+    var pillLayer = el("g", {}, g);
+
+    function makePills() {
+      return labels.map(function (label) {
+        var pg = el("g", { opacity: "0" }, pillLayer);
+        var rect = el("rect", { y: -22, height: 44, rx: 12, fill: "var(--pill)" }, pg);
+        var t = el("text", { y: 1, "text-anchor": "middle", "dominant-baseline": "middle", fill: "#17150f" }, pg);
+        t.style.cssText = "font-family:'Manrope',Helvetica,sans-serif;font-size:17px;font-weight:800;letter-spacing:0.01em;text-transform:uppercase;";
+        t.textContent = label;
+        return { g: pg, rect: rect, t: t };
+      });
+    }
+    var A = makePills(), B = makePills();
+
+    // The R machine
+    var m = el("g", { transform: "translate(720 760)" }, g);
+    el("rect", { x: -56, y: -56, width: 112, height: 112, rx: 28, fill: "var(--bg)", stroke: "var(--ink)", "stroke-width": 4 }, m);
+    var R = el("text", { x: 0, y: 2, "text-anchor": "middle", "dominant-baseline": "central", fill: "var(--ink)" }, m);
+    R.style.cssText = "font-family:'Manrope',Helvetica,sans-serif;font-size:72px;font-weight:800;letter-spacing:-0.04em;";
+    R.textContent = "R";
+    host.appendChild(svg);
+
+    var OFFSETS = [], TOTAL = 0, period = 0;
+    function measure() {
+      OFFSETS = [];
+      var acc = 0;
+      A.forEach(function (p, k) {
+        var bw = Math.max(28, p.t.getComputedTextLength()) + 24;
+        [p, B[k]].forEach(function (q) { q.rect.setAttribute("x", -bw / 2); q.rect.setAttribute("width", bw); });
+        OFFSETS.push(acc + bw / 2);
+        acc += bw + 40;
+      });
+      TOTAL = acc;
+      period = 0;
+    }
+    measure();
+    if (document.fonts) document.fonts.ready.then(measure);
+
+    function fit() {
+      var W = host.clientWidth, H = host.clientHeight;
+      if (!W || !H) return;
+      var s = Math.min(Math.max(W / VIEW_W, H / VIEW_H), H / VISIBLE_H);
+      svg.style.width = VIEW_W * s + "px";
+      svg.style.height = VIEW_H * s + "px";
+    }
+    fit();
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(host);
+    else window.addEventListener("resize", fit);
+
+    function place(pill, d, len) {
+      if (d < 0 || d > len) { pill.g.setAttribute("opacity", "0"); return; }
+      var p = outP.getPointAtLength(d), q = outP.getPointAtLength(Math.min(len, d + 2));
+      var a = Math.atan2(q.y - p.y, q.x - p.x) * 180 / Math.PI;
+      pill.g.setAttribute("transform", "translate(" + p.x + " " + p.y + ") rotate(" + a + ")");
+      pill.g.setAttribute("opacity", String(Math.min(1, d / 90, (len - d) / 90)));
+    }
+    function frame(tSec) {
+      if (!period) period = tp.getComputedTextLength() / REPEATS;
+      if (period > 0) tp.setAttribute("startOffset", String(-(period - ((tSec * 70) % period))));
+      var len = outP.getTotalLength();
+      for (var k = 0; k < A.length; k++) {
+        var d = (tSec * 70 + OFFSETS[k]) % TOTAL;
+        place(A[k], d, len);
+        place(B[k], d + TOTAL, len);
+      }
+    }
+
+    if (reducedMotion) { frame(0); return; }
+    var t0 = null;
+    function loop(now) {
+      if (t0 == null) t0 = now;
+      frame(((now - t0) / 1000) * SPEED);
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+  })();
+
+  // Footer wordmark: letters bounce when you keep scrolling past the bottom
+  (function mountWordmarkSpring() {
+    if (reducedMotion) return;
+    var wm = document.getElementById("wordmark");
+    if (!wm) return;
+    var spans = wm.children;
+    var s = { y: 0, v: 0, t: 0, running: false };
+    var touchY = 0;
+    function atBottom() { return window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 2; }
+    function run() {
+      if (s.running) return;
+      s.running = true;
+      var last = performance.now();
+      function step(now) {
+        var dt = Math.min(0.033, (now - last) / 1000);
+        last = now;
+        s.v += (-180 * s.y - 9 * s.v) * dt;
+        s.y += s.v * dt;
+        s.t += dt;
+        for (var i = 0; i < spans.length; i++) {
+          var ph = Math.max(0, s.t - i * 0.055);
+          var amp = Math.abs(s.y) * Math.exp(-ph * 3.2);
+          spans[i].style.transform = "translateY(" + (-(Math.abs(Math.sin(ph * 11)) * amp)).toFixed(1) + "px)";
+        }
+        if (Math.abs(s.y) > 0.2 || Math.abs(s.v) > 0.5) requestAnimationFrame(step);
+        else {
+          s.y = 0; s.v = 0; s.t = 0; s.running = false;
+          for (var j = 0; j < spans.length; j++) spans[j].style.transform = "translateY(0)";
+        }
+      }
+      requestAnimationFrame(step);
+    }
+    function kick(dy) {
+      if (!atBottom() || dy <= 0) return;
+      s.v = Math.min(s.v + dy * 0.9, 260);
+      run();
+    }
+    window.addEventListener("wheel", function (e) { kick(e.deltaY); }, { passive: true });
+    window.addEventListener("touchstart", function (e) { touchY = e.touches[0].clientY; }, { passive: true });
+    window.addEventListener("touchmove", function (e) {
+      var y = e.touches[0].clientY;
+      kick((touchY - y) * 1.6);
+      touchY = y;
+    }, { passive: true });
+  })();
+})();
+</script>
+</body>
+</html>
